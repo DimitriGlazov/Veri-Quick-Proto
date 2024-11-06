@@ -114,9 +114,6 @@ def generate_qr_code_with_metadata(files_metadata):
 st.title("Veri-quick©️ ✅")
 st.write("Let's make verification paperless ")
 
-# Link to the GitHub-hosted image
-intro_image_url = "https://raw.githubusercontent.com/DimitriGlazov/Veri-Quick-Proto/refs/heads/main/instructions.png?token=GHSAT0AAAAAAC2B24DH6GVBQIX5FLKO4GEOZZLPTBQ"
-
 # Show the introductory image only if no files have been uploaded
 if 'uploaded_files' not in st.session_state:
     st.session_state['uploaded_files'] = False
@@ -126,6 +123,9 @@ if not st.session_state['uploaded_files']:
 
 # File uploader
 uploaded_files = st.file_uploader("Upload PDF documents", type="pdf", accept_multiple_files=True)
+
+# Link to the GitHub-hosted image
+intro_image_url = "https://raw.githubusercontent.com/DimitriGlazov/Veri-Quick-Proto/refs/heads/main/instructions.png?token=GHSAT0AAAAAAC2B24DH6GVBQIX5FLKO4GEOZZLPTBQ"
 
 # Process uploaded files
 if uploaded_files:
