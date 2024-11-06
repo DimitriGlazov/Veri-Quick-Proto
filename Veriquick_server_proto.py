@@ -53,7 +53,6 @@ def upload_file_to_dropbox(file, filename):
         return shared_link_metadata.url.replace("?dl=0", "?dl=1")
 
     except dropbox.exceptions.AuthError:
-
         if refresh_access_token():
             return upload_file_to_dropbox(file, filename)
         else:
@@ -62,6 +61,13 @@ def upload_file_to_dropbox(file, filename):
     except dropbox.exceptions.ApiError as e:
         st.error(f"Dropbox API error: {e}")
         return None
+
+# Function to mask Aadhaar and PAN numbers
+def mask_aadhaar(aadhaar):
+    return aadhaar[:4] + " XXXX XXXX"
+
+def mask_pan(pan):
+    return pan[:5] + "XXXX" + pan[-1]
 
 # Function to extract Aadhaar and PAN metadata from content
 def extract_metadata_from_pdf(file_content, file_url):
@@ -77,6 +83,10 @@ def extract_metadata_from_pdf(file_content, file_url):
         # Extract Aadhaar and PAN numbers from text
         aadhaar_numbers = re.findall(AADHAAR_REGEX, text_content)
         pan_numbers = re.findall(PAN_REGEX, text_content)
+
+        # Mask Aadhaar and PAN numbers
+        aadhaar_numbers = [mask_aadhaar(a) for a in aadhaar_numbers]
+        pan_numbers = [mask_pan(p) for p in pan_numbers]
 
         # Update metadata based on detected document types
         if aadhaar_numbers:
@@ -126,4 +136,9 @@ if uploaded_files:
 
         st.image(qr_buffer, caption="QR Code with Document Metadata", use_column_width=True)
         st.download_button(label="Download QR Code", data=qr_buffer, file_name="document_metadata_qr.png", mime="image/png")
-        st.json(files_metadata)  # Display metadata as JSON for reference
+
+        # Display masked metadata as JSON for reference
+        for meta in files_metadata:
+            st.write(f"Document Type: {meta['document_type']}")
+            st.write(f"Number of Aadhaar numbers detected: {len(meta['aadhaar_numbers'])}")
+            st.write(f"Number of PAN numbers detected: {len(meta['pan_numbers'])}")
