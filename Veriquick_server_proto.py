@@ -122,7 +122,7 @@ uploaded_files = st.file_uploader("Upload PDF documents", type="pdf", accept_mul
 
 # Show the introductory image only if no files have been uploaded
 if not uploaded_files:
-    st.image(intro_image_url, caption="Upload your documents to start", use_column_width=True)
+    st.image(intro_image_url, caption="Upload your documents to get started", use_column_width=True)
 
 # Process uploaded files
 if uploaded_files:
