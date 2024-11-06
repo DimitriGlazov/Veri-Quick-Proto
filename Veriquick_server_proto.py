@@ -115,7 +115,7 @@ st.title("Veri-quick©️ ✅")
 st.write("Let's make verification paperless ")
 
 # Link to the GitHub-hosted image (ensure you have the correct raw image URL)
-intro_image_url = "https://raw.githubusercontent.com/DimitriGlazov/Veri-Quick-Proto/refs/heads/main/instructions.png?token=GHSAT0AAAAAAC2B24DH6GVBQIX5FLKO4GEOZZLPTBQ"
+intro_image_url = "https://github.com/DimitriGlazov/Veri-Quick-Proto/blob/main/instructions.png"
 
 # File uploader
 uploaded_files = st.file_uploader("Upload PDF documents", type="pdf", accept_multiple_files=True)
