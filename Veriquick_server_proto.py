@@ -115,7 +115,7 @@ st.title("Veri-quick©️ ✅")
 st.write("Let's make verification paperless ")
 
 # Link to the GitHub-hosted image
-intro_image_url = "https://github.com/DimitriGlazov/Veri-Quick-Proto/blob/main/instructions.png?raw=true"
+intro_image_url = "https://raw.githubusercontent.com/DimitriGlazov/Veri-Quick-Proto/refs/heads/main/instructions.png?token=GHSAT0AAAAAAC2B24DH6GVBQIX5FLKO4GEOZZLPTBQ"
 
 # Show the introductory image only if no files have been uploaded
 if 'uploaded_files' not in st.session_state:
