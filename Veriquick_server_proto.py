@@ -118,7 +118,7 @@ st.write("Let's make verification paperless ")
 uploaded_files = st.file_uploader("Upload PDF documents", type="pdf", accept_multiple_files=True)
 
 # Direct link to the image file on GitHub
-intro_image_url = "https://github.com/DimitriGlazov/Veri-Quick-Proto/blob/e09f9b398b73e851d99185b8024cb8e4254a5e03/instructions.png"
+intro_image_url = "https://lh6.googleusercontent.com/es6wKLjs113OzaOdu1LKfr_M8TRc2fMvI6dwV2C5RKiiLWxrVBdMN5b9ZI9wp_eSOMyXnqzSxn1Ixe7HmD2o3L1rnQwXq9iNFHw0ELvJtaxMHkKox_0wdKZZ2jfApH1-Ew=w1280"
 
 # Show the introductory image only if no files have been uploaded
 if not uploaded_files:
