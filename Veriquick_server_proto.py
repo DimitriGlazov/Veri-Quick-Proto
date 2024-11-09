@@ -79,10 +79,10 @@ def extract_metadata_from_pdf(file_content, file_url):
         text_content = ""
         for page in pdf_document:
             text_content += page.get_text()
-        
-        # Extract Aadhaar and PAN numbers from text
-        aadhaar_numbers = re.findall(AADHAAR_REGEX, text_content)
-        pan_numbers = re.findall(PAN_REGEX, text_content)
+
+        # Extract unique Aadhaar and PAN numbers from text
+        aadhaar_numbers = set(re.findall(AADHAAR_REGEX, text_content))  # Use set to get unique Aadhaar numbers
+        pan_numbers = set(re.findall(PAN_REGEX, text_content))  # Use set to get unique PAN numbers
 
         # Mask Aadhaar and PAN numbers
         aadhaar_numbers = [mask_aadhaar(a) for a in aadhaar_numbers]
@@ -91,10 +91,10 @@ def extract_metadata_from_pdf(file_content, file_url):
         # Update metadata based on detected document types
         if aadhaar_numbers:
             metadata["document_type"] = "Aadhaar"
-            metadata["aadhaar_numbers"] = aadhaar_numbers
+            metadata["aadhaar_numbers"] = list(aadhaar_numbers)  # Convert set back to list
         elif pan_numbers:
             metadata["document_type"] = "PAN"
-            metadata["pan_numbers"] = pan_numbers
+            metadata["pan_numbers"] = list(pan_numbers)  # Convert set back to list
 
     except Exception as e:
         st.error(f"Error extracting metadata: {e}")
