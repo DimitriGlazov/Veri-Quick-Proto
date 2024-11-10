@@ -118,7 +118,8 @@ st.write("Let's make verification paperless and quick ")
 uploaded_files = st.file_uploader("Upload PDF documents", type="pdf", accept_multiple_files=True)
 
 # Direct link to the image file on GitHub
-intro_image_url = "https://lh3.googleusercontent.com/cGaA9eSB-_abg-zVnikQ_W3bo1TQs9fEnHCoBTDp06kUJRr_J-ookwbvGbiJ7X2LUdykts_amvFGFSYo985yFhWvqRCsKjWGRIp9LOWUkoY9FZAJX3jAlG4J33jYxKaQBA=w1280"
+intro_image_url = "https://www.dropbox.com/scl/fi/lwyb9ivag1tztu15jkh6p/instructions-1.png?rlkey=m80qnz5lhrsgx7ir0b3wz8omb&raw=1"
+
 # Show the introductory image only if no files have been uploaded
 if not uploaded_files:
     st.image(intro_image_url, caption="Upload your documents to get started", use_column_width=True)
