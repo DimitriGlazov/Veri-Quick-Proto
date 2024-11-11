@@ -111,7 +111,7 @@ def generate_qr_code_with_metadata(files_metadata):
 
 # Main Streamlit App
 st.title("Veri-quick©️ ✅")
-st.write("Let's make verification paperless ")
+st.write("Let's make verification paperless again ")
 
 # File uploader allowing all file types
 uploaded_files = st.file_uploader("Upload your documents", type=None, accept_multiple_files=True)
