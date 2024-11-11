@@ -50,8 +50,7 @@ def upload_file_to_dropbox(file, filename):
     try:
         dbx.files_upload(file.getvalue(), dropbox_path)
         shared_link_metadata = dbx.sharing_create_shared_link_with_settings(dropbox_path)
-        return shared_link_metadata.url.replace("?dl=0", "?dl=1")
-
+        return shared_link_metadata.url.replace("?dl=0", "?raw=1")  # Direct link
     except dropbox.exceptions.AuthError:
         if refresh_access_token():
             return upload_file_to_dropbox(file, filename)
@@ -81,8 +80,8 @@ def extract_metadata_from_pdf(file_content, file_url):
             text_content += page.get_text()
 
         # Extract unique Aadhaar and PAN numbers from text
-        aadhaar_numbers = set(re.findall(AADHAAR_REGEX, text_content))  # Use set to get unique Aadhaar numbers
-        pan_numbers = set(re.findall(PAN_REGEX, text_content))  # Use set to get unique PAN numbers
+        aadhaar_numbers = set(re.findall(AADHAAR_REGEX, text_content))  # Unique Aadhaar numbers
+        pan_numbers = set(re.findall(PAN_REGEX, text_content))  # Unique PAN numbers
 
         # Mask Aadhaar and PAN numbers
         aadhaar_numbers = [mask_aadhaar(a) for a in aadhaar_numbers]
@@ -91,10 +90,10 @@ def extract_metadata_from_pdf(file_content, file_url):
         # Update metadata based on detected document types
         if aadhaar_numbers:
             metadata["document_type"] = "Aadhaar"
-            metadata["aadhaar_numbers"] = list(aadhaar_numbers)  # Convert set back to list
+            metadata["aadhaar_numbers"] = list(aadhaar_numbers)  # Convert set to list
         elif pan_numbers:
             metadata["document_type"] = "PAN"
-            metadata["pan_numbers"] = list(pan_numbers)  # Convert set back to list
+            metadata["pan_numbers"] = list(pan_numbers)  # Convert set to list
 
     except Exception as e:
         st.error(f"Error extracting metadata: {e}")
@@ -112,12 +111,12 @@ def generate_qr_code_with_metadata(files_metadata):
 
 # Main Streamlit App
 st.title("Veri-quick©️ ✅")
-st.write("Let's make verification paperless and quick ")
+st.write("Let's make verification paperless ")
 
-# File uploader
-uploaded_files = st.file_uploader("Upload PDF documents", type="pdf", accept_multiple_files=True)
+# File uploader allowing all file types
+uploaded_files = st.file_uploader("Upload your documents", type=None, accept_multiple_files=True)
 
-# Direct link to the image file on GitHub
+# Introductory Image URL (ensure it's a direct link ending with image extension)
 intro_image_url = "https://www.dropbox.com/scl/fi/lwyb9ivag1tztu15jkh6p/instructions-1.png?rlkey=m80qnz5lhrsgx7ir0b3wz8omb&raw=1"
 
 # Show the introductory image only if no files have been uploaded
@@ -131,9 +130,13 @@ if uploaded_files:
     for uploaded_file in uploaded_files:
         file_content = BytesIO(uploaded_file.read())
         file_url = upload_file_to_dropbox(file_content, uploaded_file.name)
-        
+
         if file_url:
-            metadata = extract_metadata_from_pdf(file_content, file_url)
+            if uploaded_file.type == "application/pdf":
+                metadata = extract_metadata_from_pdf(file_content, file_url)
+            else:
+                # For non-PDFs, mark as "Other" with no metadata
+                metadata = {"document_url": file_url, "document_type": "Other", "aadhaar_numbers": [], "pan_numbers": []}
             files_metadata.append(metadata)
 
     # Generate and display QR code if files are uploaded
@@ -147,7 +150,16 @@ if uploaded_files:
         st.download_button(label="Download QR Code", data=qr_buffer, file_name="document_metadata_qr.png", mime="image/png")
 
         # Display masked metadata as JSON for reference
-        for meta in files_metadata:
-            st.write(f"Document Type: {meta['document_type']}")
-            st.write(f"Number of Aadhaar numbers detected: {len(meta['aadhaar_numbers'])}")
-            st.write(f"Number of PAN numbers detected: {len(meta['pan_numbers'])}")
+        for idx, meta in enumerate(files_metadata, start=1):
+            st.subheader(f"Document {idx}")
+            st.write(f"**Document Type:** {meta['document_type']}")
+            st.write(f"**Number of Aadhaar numbers detected:** {len(meta['aadhaar_numbers'])}")
+            st.write(f"**Number of PAN numbers detected:** {len(meta['pan_numbers'])}")
+            if meta['aadhaar_numbers']:
+                st.write("**Aadhaar Numbers:**")
+                for a in meta['aadhaar_numbers']:
+                    st.write(f"- {a}")
+            if meta['pan_numbers']:
+                st.write("**PAN Numbers:**")
+                for p in meta['pan_numbers']:
+                    st.write(f"- {p}")
