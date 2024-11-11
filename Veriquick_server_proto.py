@@ -139,4 +139,4 @@ if uploaded_files:
         # Display a simple list of uploaded document links
         st.subheader("Uploaded Documents")
         for idx, meta in enumerate(files_metadata, start=1):
-            st.write(f"**Document {idx}**: [Download Link]({meta['document_url']})")
+            st.write(f"**Document {idx}**: [Cloud Link]({meta['document_url']})")
