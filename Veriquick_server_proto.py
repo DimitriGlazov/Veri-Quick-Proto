@@ -61,16 +61,9 @@ def upload_file_to_dropbox(file, filename):
         st.error(f"Dropbox API error: {e}")
         return None
 
-# Function to mask Aadhaar and PAN numbers
-def mask_aadhaar(aadhaar):
-    return aadhaar[:4] + " XXXX XXXX"
-
-def mask_pan(pan):
-    return pan[:5] + "XXXX" + pan[-1]
-
 # Function to extract Aadhaar and PAN metadata from content
 def extract_metadata_from_pdf(file_content, file_url):
-    metadata = {"document_url": file_url, "document_type": "Other", "aadhaar_numbers": [], "pan_numbers": []}
+    metadata = {"document_url": file_url, "document_type": "Other"}
 
     try:
         # Read PDF content using PyMuPDF
@@ -83,17 +76,11 @@ def extract_metadata_from_pdf(file_content, file_url):
         aadhaar_numbers = set(re.findall(AADHAAR_REGEX, text_content))  # Unique Aadhaar numbers
         pan_numbers = set(re.findall(PAN_REGEX, text_content))  # Unique PAN numbers
 
-        # Mask Aadhaar and PAN numbers
-        aadhaar_numbers = [mask_aadhaar(a) for a in aadhaar_numbers]
-        pan_numbers = [mask_pan(p) for p in pan_numbers]
-
         # Update metadata based on detected document types
         if aadhaar_numbers:
             metadata["document_type"] = "Aadhaar"
-            metadata["aadhaar_numbers"] = list(aadhaar_numbers)  # Convert set to list
         elif pan_numbers:
             metadata["document_type"] = "PAN"
-            metadata["pan_numbers"] = list(pan_numbers)  # Convert set to list
 
     except Exception as e:
         st.error(f"Error extracting metadata: {e}")
@@ -127,7 +114,7 @@ if not uploaded_files:
 if uploaded_files:
     files_metadata = []
 
-    for uploaded_file in uploaded_files:
+    for idx, uploaded_file in enumerate(uploaded_files, start=1):
         file_content = BytesIO(uploaded_file.read())
         file_url = upload_file_to_dropbox(file_content, uploaded_file.name)
 
@@ -136,7 +123,7 @@ if uploaded_files:
                 metadata = extract_metadata_from_pdf(file_content, file_url)
             else:
                 # For non-PDFs, mark as "Other" with no metadata
-                metadata = {"document_url": file_url, "document_type": "Other", "aadhaar_numbers": [], "pan_numbers": []}
+                metadata = {"document_url": file_url, "document_type": "Other"}
             files_metadata.append(metadata)
 
     # Generate and display QR code if files are uploaded
@@ -149,17 +136,7 @@ if uploaded_files:
         st.image(qr_buffer, caption="QR Code with Document Metadata", use_column_width=True)
         st.download_button(label="Download QR Code", data=qr_buffer, file_name="document_metadata_qr.png", mime="image/png")
 
-        # Display masked metadata as JSON for reference
+        # Display a simple list of uploaded document links
+        st.subheader("Uploaded Documents")
         for idx, meta in enumerate(files_metadata, start=1):
-            st.subheader(f"Document {idx}")
-            st.write(f"**Document Type:** {meta['document_type']}")
-            st.write(f"**Number of Aadhaar numbers detected:** {len(meta['aadhaar_numbers'])}")
-            st.write(f"**Number of PAN numbers detected:** {len(meta['pan_numbers'])}")
-            if meta['aadhaar_numbers']:
-                st.write("**Aadhaar Numbers:**")
-                for a in meta['aadhaar_numbers']:
-                    st.write(f"- {a}")
-            if meta['pan_numbers']:
-                st.write("**PAN Numbers:**")
-                for p in meta['pan_numbers']:
-                    st.write(f"- {p}")
+            st.write(f"**Document {idx}**: [Download Link]({meta['document_url']})")
